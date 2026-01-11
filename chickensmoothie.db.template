@@ -1,0 +1,31 @@
+CREATE TABLE "Items" (
+	"itemLID"	INTEGER UNIQUE,
+	"itemRID"	INTEGER UNIQUE,
+	"itemName"	TEXT,
+	"itemYear"	INTEGER,
+	"itemEvent"	TEXT,
+	"itemLink"	TEXT
+)
+
+Example:
+itemLID: 9
+itemRID: 492
+itemName: "Merry Christmas"
+itemYear: 2008
+itemEvent: "Christmas"
+itemLink: "https://www.chickensmoothie.com/archive/2008/Christmas/Items/"
+
+---
+
+CREATE TABLE "Pets" (
+	"petID"	TEXT UNIQUE,
+	"petYear"	INTEGER,
+	"petEvent"	TEXT,
+	"petLink"	TEXT
+)
+
+Example:
+petID: "08CEC244AAC523BD6BDC48310149553A"
+petYear: 2008
+petEvent: "July"
+petLink: "https://www.chickensmoothie.com/archive/2008/July/"
