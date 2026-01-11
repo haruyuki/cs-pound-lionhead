@@ -1,0 +1,16 @@
+[project]
+name = "cs-pound-lionhead"
+version = "4.0.0"
+description = "A Discord bot for the virtual pet adoption site Chicken Smoothie."
+requires-python = ">=3.13"
+dependencies = [
+    "asqlite==2.0.0",
+    "discord-py==2.6.4",
+    "python-dotenv>=1.2.1",
+]
+
+[dependency-groups]
+dev = [
+    "black==26.1a1"
+]
+
