@@ -125,7 +125,7 @@ def is_valid_chickensmoothie_link(link: str) -> bool:
     }
 
 
-def extract_item_ids(link: str) -> Tuple[Optional[int], Optional[int]]:
+def extract_item_ids(link: str) -> Tuple[int | None, int | None]:
     path = urlparse(link).path
     m = re.search(r"/item/(\d+)&p=(\d+)", path)
     if not m:
@@ -136,7 +136,7 @@ def extract_item_ids(link: str) -> Tuple[Optional[int], Optional[int]]:
 
 
 def prepare_message(
-    name: Optional[str], event: str, year: int, link: str, is_pet: bool = True
+    name: str | None, event: str, year: int, link: str, is_pet: bool = True
 ) -> str:
     is_month = event in MONTHS
     entity_type = "pet" if is_pet else "item"
