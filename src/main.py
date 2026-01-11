@@ -85,8 +85,8 @@ class Bot(commands.Bot):
 
 
 async def main():
-    logger = logging.getLogger()  # root logger
-    logger.setLevel(logging.DEBUG)  # capture everything, handlers filter as needed
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
 
     dt_fmt = "%Y-%m-%d %H:%M:%S"
     formatter = logging.Formatter(
