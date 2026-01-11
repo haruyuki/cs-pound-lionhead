@@ -1,38 +1,55 @@
 from __future__ import annotations
+
+import asyncio
 import os
 import logging
+import logging.handlers
+from typing import List
 
+import aiohttp
 import asqlite
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
 import cogs
+from session_manager import login
 
 load_dotenv()
-discord.utils.setup_logging()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD_ID = int(os.getenv("DEV_GUILD_ID"))
 
 
 class Bot(commands.Bot):
-    def __init__(self, db_pool=asqlite.Pool) -> None:
+    def __init__(
+        self,
+        *args,
+        initial_extensions: List[str],
+        db_pool: asqlite.Pool,
+        web_client: aiohttp.ClientSession,
+        **kwargs,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self.initial_extensions = initial_extensions
         self.db_pool = db_pool
-        intents = discord.Intents.default()
-        intents.message_content = True
-        super().__init__(
-            command_prefix=commands.when_mentioned_or("!"),
-            intents=intents,
-            help_command=None,
-        )
+        self.web_client = web_client
 
     async def setup_hook(self):
-        self.db_pool = await asqlite.create_pool("../chickensmoothie.db")
+        logging.info("Creating logged-in ChickenSmoothie session...")
+        login_status = await login(
+            self.web_client,
+            os.getenv("CS_USERNAME"),
+            os.getenv("CS_PASSWORD"),
+        )
+        if not login_status:
+            logging.error("Failed to log in to ChickenSmoothie.")
+        else:
+            logging.info("Connected to ChickenSmoothie session.")
 
-        for cog in cogs.iter_cogs():
-            logging.info(f"Loading extension: {cog}")
-            await self.load_extension(cog)
+        for extension in self.initial_extensions:
+            logging.info(f"Loading extension: {extension}")
+            await self.load_extension(extension)
 
         guild = discord.Object(id=GUILD_ID)
         self.tree.copy_global_to(guild=guild)
@@ -49,9 +66,56 @@ class Bot(commands.Bot):
 
     async def close(self) -> None:
         await self.db_pool.close()
+        if self.web_client:
+            await self.web_client.close()
         await super().close()
 
 
+async def main():
+    logger = logging.getLogger()  # root logger
+    logger.setLevel(logging.DEBUG)  # capture everything, handlers filter as needed
+
+    dt_fmt = "%Y-%m-%d %H:%M:%S"
+    formatter = logging.Formatter(
+        "[{asctime}] [{levelname:<8}] {name}: {message}", dt_fmt, style="{"
+    )
+
+    file_handler = logging.handlers.RotatingFileHandler(
+        filename="../discord.log",
+        encoding="utf-8",
+        maxBytes=32 * 1024 * 1024,  # 32 MiB
+        backupCount=5,
+    )
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(logging.DEBUG)
+    logger.addHandler(file_handler)
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    console_handler.setLevel(logging.DEBUG)  # show INFO+ on console
+    logger.addHandler(console_handler)
+
+    headers = {
+        "User-Agent": "CS-Pound Discord Bot Agent",
+        "From": "haru@haruyuki.moe",
+    }
+    base_url = "https://www.chickensmoothie.com"
+
+    async with aiohttp.ClientSession(base_url=base_url, headers=headers) as our_client:
+
+        extensions = list(cogs.iter_cogs())
+        intents = discord.Intents.default()
+        intents.message_content = True
+        db_pool = await asqlite.create_pool("../chickensmoothie.db")
+        async with Bot(
+            commands.when_mentioned,
+            db_pool=db_pool,
+            web_client=our_client,
+            initial_extensions=extensions,
+            intents=intents,
+        ) as bot:
+            await bot.start(TOKEN)
+
+
 if __name__ == "__main__":
-    bot = Bot()
-    bot.run(TOKEN)
+    asyncio.run(main())
