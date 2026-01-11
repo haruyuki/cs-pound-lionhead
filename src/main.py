@@ -9,11 +9,11 @@ from typing import List
 import aiohttp
 import asqlite
 import discord
+import lxml.html
 from discord.ext import commands
 from dotenv import load_dotenv
 
 import cogs
-from session_manager import login
 
 load_dotenv()
 
@@ -36,16 +36,29 @@ class Bot(commands.Bot):
         self.web_client = web_client
 
     async def setup_hook(self):
-        logging.info("Creating logged-in ChickenSmoothie session...")
-        login_status = await login(
-            self.web_client,
-            os.getenv("CS_USERNAME"),
-            os.getenv("CS_PASSWORD"),
-        )
-        if not login_status:
-            logging.error("Failed to log in to ChickenSmoothie.")
-        else:
-            logging.info("Connected to ChickenSmoothie session.")
+        payload = {
+            "username": os.getenv("CS_USERNAME"),
+            "password": os.getenv("CS_PASSWORD"),
+            "redirect": "index.php",
+            "autologin": "on",
+            "login": "Login",
+        }
+
+        logging.debug("Performing login...")
+        async with self.web_client.post(
+            "/Forum/ucp.php?mode=login", data=payload
+        ) as resp:
+            resp.raise_for_status()
+            text = await resp.text()
+            dom = lxml.html.fromstring(text)
+            login_message = dom.xpath('//div[@id="message"]//p/text()')
+            if (
+                login_message
+                and login_message[0] == "You have been successfully logged in."
+            ):
+                logging.info("Login successful.")
+            else:
+                logging.error("Login failed. Some features may not work properly.")
 
         for extension in self.initial_extensions:
             logging.info(f"Loading extension: {extension}")
