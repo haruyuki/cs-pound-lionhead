@@ -49,7 +49,7 @@ class IdentifyCog(commands.Cog):
 
         if "item" in link:
             data = None
-            async with self.bot.db_pool.acquire() as conn:
+            async with self.bot.archive_db_pool.acquire() as conn:
                 async with conn.execute(
                     "SELECT itemName, itemEvent, itemYear, itemLink FROM Items WHERE itemLID = ? AND itemRID = ?",
                     extract_item_ids(link),
@@ -82,7 +82,7 @@ class IdentifyCog(commands.Cog):
             data = None
             link_query = urlparse(link).query
             pet_id = parse_qs(link_query).get("k", [None])[0]
-            async with self.bot.db_pool.acquire() as conn:
+            async with self.bot.archive_db_pool.acquire() as conn:
                 async with conn.execute(
                     "SELECT petEvent, petYear, petLink, petLink FROM Pets WHERE petID = ?",
                     (pet_id,),

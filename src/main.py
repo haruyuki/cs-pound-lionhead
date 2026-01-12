@@ -26,13 +26,15 @@ class Bot(commands.Bot):
         self,
         *args,
         initial_extensions: List[str],
-        db_pool: asqlite.Pool,
+        archive_db_pool: asqlite.Pool,
+        autoremind_db_pool: asqlite.Pool,
         web_client: aiohttp.ClientSession,
         **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.initial_extensions = initial_extensions
-        self.db_pool = db_pool
+        self.archive_db_pool = archive_db_pool
+        self.autoremind_db_pool = autoremind_db_pool
         self.web_client = web_client
 
     async def setup_hook(self):
@@ -78,7 +80,8 @@ class Bot(commands.Bot):
         logging.info("------")
 
     async def close(self) -> None:
-        await self.db_pool.close()
+        await self.archive_db_pool.close()
+        await self.autoremind_db_pool.close()
         if self.web_client:
             await self.web_client.close()
         await super().close()
@@ -120,10 +123,12 @@ async def main():
         extensions.append("jishaku")
         intents = discord.Intents.default()
         intents.message_content = True
-        db_pool = await asqlite.create_pool("../chickensmoothie.db")
+        archive_db_pool = await asqlite.create_pool("../chickensmoothie.db")
+        autoremind_db_pool = await asqlite.create_pool("../autoremind.db")
         async with Bot(
             commands.when_mentioned,
-            db_pool=db_pool,
+            archive_db_pool=archive_db_pool,
+            autoremind_db_pool=autoremind_db_pool,
             web_client=our_client,
             initial_extensions=extensions,
             intents=intents,
