@@ -4,6 +4,7 @@ import asyncio
 import os
 import logging
 import logging.handlers
+import sys
 from typing import List
 
 import aiohttp
@@ -106,7 +107,7 @@ async def main():
     file_handler.setLevel(logging.DEBUG)
     logger.addHandler(file_handler)
 
-    console_handler = logging.StreamHandler()
+    console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
     console_handler.setLevel(logging.DEBUG)  # show INFO+ on console
     logger.addHandler(console_handler)
