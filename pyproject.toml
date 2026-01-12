@@ -12,6 +12,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "black==26.1a1"
+    "black==26.1a1",
+    "jishaku==2.6.3",
 ]
 

@@ -117,6 +117,7 @@ async def main():
     async with aiohttp.ClientSession(base_url=base_url, headers=headers) as our_client:
 
         extensions = list(cogs.iter_cogs())
+        extensions.append("jishaku")
         intents = discord.Intents.default()
         intents.message_content = True
         db_pool = await asqlite.create_pool("../chickensmoothie.db")
