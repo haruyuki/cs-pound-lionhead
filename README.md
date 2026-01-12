@@ -1,5 +1,10 @@
 # CS-Pound Discord Bot
 
+[![Discord](https://discord.com/api/guilds/409642350600781824/embed.png)](https://support.haruyuki.moe/)
+[![Python 3.7](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![License](https://img.shields.io/github/license/haruyuki/cs-pound-lionhead.svg)](https://github.com/haruyuki/cs-pound-lionhead/blob/main/LICENSE)
+
 <p align="center">
   <img src="https://images.unsplash.com/photo-1706533079022-6a7008d9a89c?q=75&fm=jpg&w=400&fit=max&&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" height="500">
 </p>
