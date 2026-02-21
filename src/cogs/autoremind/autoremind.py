@@ -111,6 +111,19 @@ class AutoRemindCog(commands.Cog):
                 f"UPDATE AutoRemind SET {event.value} = 0 WHERE userID = ?",
                 (user_id,),
             )
+
+            # Check if both pound and laf are now 0
+            cur = await conn.execute(
+                "SELECT pound, laf FROM AutoRemind WHERE userID = ?",
+                (user_id,),
+            )
+            updated = await cur.fetchone()
+            if updated and updated[0] == 0 and updated[1] == 0:
+                await conn.execute(
+                    "DELETE FROM AutoRemind WHERE userID = ?",
+                    (user_id,),
+                )
+
             await conn.commit()
 
         await interaction.response.send_message(
