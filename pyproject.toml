@@ -4,15 +4,16 @@ version = "4.0.0"
 description = "A Discord bot for the virtual pet adoption site Chicken Smoothie."
 requires-python = ">=3.13"
 dependencies = [
+    "aiohttp>=3.13.5",
     "asqlite==2.0.0",
-    "discord-py==2.6.4",
-    "lxml==6.0.2",
-    "python-dotenv>=1.2.1",
+    "discord-py>=2.7.1",
+    "lxml==6.0.3",
+    "python-dotenv>=1.2.2",
 ]
 
 [dependency-groups]
 dev = [
-    "black==26.1a1",
+    "black==26.3.1",
     "jishaku==2.6.3",
 ]
 
