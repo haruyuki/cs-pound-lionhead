@@ -38,9 +38,9 @@ async def get_opening_status(
     ]:  # If either Pound or Lost and Found is open
         event = is_open_check[0][4:]
         if event == "Lost and Found":
-            remaining_selector = dom.xpath('//div[@id="items_remaining"]/text()')
+            remaining_selector = dom.xpath('//div[@id="items-remaining"]/text()')
         else:
-            remaining_selector = dom.xpath('//div[@id="pets_remaining"]/text()')
+            remaining_selector = dom.xpath('//div[@id="pets-remaining"]/text()')
         remaining_text = remaining_selector[0] if remaining_selector else ""
         match = re.search(r"\d+", remaining_text)
         remaining_count = int(match.group()) if match else 0
