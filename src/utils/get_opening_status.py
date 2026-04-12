@@ -15,7 +15,7 @@ class OpeningClosed:
 @dataclass
 class OpeningOpen:
     is_open: bool = True
-    event_type: str = ""
+    event_type: str | None = ""
     remaining_count: int = 0
 
 
@@ -30,19 +30,19 @@ async def get_opening_status(
         text = await resp.text()
         dom = lxml.html.fromstring(text)
 
-    event_header = normalise(get_first_text(dom, '//div[@id="csbody"]//h2[1]/text()'))
+    event_type = get_event_type(
+        normalise(get_first_text(dom, '//div[@id="csbody"]//h2[1]/text()'))
+    )
     has_pick_countdown = bool(dom.xpath('//*[@id="pound-pick-countdown"]'))
     has_open_countdown = bool(dom.xpath('//*[@id="pound-open-countdown"]'))
     countdown_text = normalise(
         get_first_text(dom, '//*[@id="pound-open-countdown"]/text()')
     )
-    event_type = get_event_type(event_header)
 
     if has_pick_countdown:
-        event = event_type or event_header.removeprefix("The ")
-        remaining_count = extract_remaining_count(dom, event)
+        remaining_count = extract_remaining_count(dom, event_type)
         return OpeningOpen(
-            is_open=True, event_type=event, remaining_count=remaining_count
+            is_open=True, event_type=event_type, remaining_count=remaining_count
         )
 
     if has_open_countdown:
