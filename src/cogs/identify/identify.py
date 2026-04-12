@@ -142,7 +142,7 @@ def prepare_message(
     is_month = event in MONTHS
     entity_type = "pet" if is_pet else "item"
 
-    name_part = f"'{name}' " if name else ""
+    name_part = f"**{name}** " if name else ""
     event_part = f"{event} {year}" if is_month else f"{year} {event}"
 
     return f"That {entity_type} is {name_part}from {event_part}.\nArchive Link: {link}"
