@@ -29,41 +29,66 @@ async def get_opening_status(
         resp.raise_for_status()
         text = await resp.text()
         dom = lxml.html.fromstring(text)
-        opening_string = dom.xpath("//h2[2]/text()")
-        is_open_check = dom.xpath("//h2[last()]/text()")
 
-    if is_open_check[0] in [
-        "The Pound",
-        "The Lost and Found",
-    ]:  # If either Pound or Lost and Found is open
-        event = is_open_check[0][4:]
-        if event == "Lost and Found":
-            remaining_selector = dom.xpath('//div[@id="items-remaining"]/text()')
-        else:
-            remaining_selector = dom.xpath('//div[@id="pets-remaining"]/text()')
-        remaining_text = remaining_selector[0] if remaining_selector else ""
-        match = re.search(r"\d+", remaining_text)
-        remaining_count = int(match.group()) if match else 0
-        return OpeningOpen(
-            is_open=True, event_type=event, remaining_count=remaining_count
+    event_header = normalise(get_first_text(dom, '//div[@id="csbody"]//h2[1]/text()'))
+
+    countdown_text = normalise(
+        get_first_text(dom, '//*[@id="pound-open-countdown"]/text()')
+    )
+    event_type = get_event_type(event_header)
+
+    closed_minutes = extract_minutes(countdown_text)
+    if closed_minutes != 0:
+        return OpeningClosed(
+            is_open=False,
+            event_type=event_type,
+            remaining_minutes=closed_minutes,
         )
 
-    opening_string = (
-        " ".join(opening_string[0].strip().split()) if opening_string else ""
-    )
-    match = re.search(
-        r"(Pound|Lost and Found).*?(?:in:|within)\s*(?:(\d+)\s*hours?)?\s*(?:,?\s*(\d+)\s*minutes?)?",
-        opening_string,
-    )
-    if match:  # If either Pound or Lost and Found is closed
-        event = "Pound" if match.group(1) == "Pound" else "Lost and Found"
-        hours = int(match.group(2)) if match.group(2) else 0
-        minutes = int(match.group(3)) if match.group(3) else 0
-        total_minutes = hours * 60 + minutes
-        return OpeningClosed(
-            is_open=False, event_type=event, remaining_minutes=total_minutes
+    if event_header == "The Pound" or event_header == "The Lost and Found":
+        remaining_count = extract_remaining_count(dom, event_type)
+        return OpeningOpen(
+            is_open=True, event_type=event_type, remaining_count=remaining_count
         )
 
     return OpeningClosed(
         is_open=False, event_type=None, remaining_minutes=None
     )  # If both are closed
+
+
+def normalise(value: str) -> str:
+    return " ".join(value.split())
+
+
+def get_first_text(dom: lxml.html.HtmlElement, xpath: str) -> str:
+    values = dom.xpath(xpath)
+    return str(values[0]) if values else ""
+
+
+def get_event_type(text: str) -> str:
+    return "Pound" if "pound" in text.lower() else "Lost and Found"
+
+
+def extract_minutes(text: str) -> int:
+    match = re.search(
+        r"(?:pound|lost and found).*?(?:in:|within)\s*(?:(\d+)\s*hours?)?\s*(?:,?\s*(\d+)\s*minutes?)?",
+        text,
+        re.IGNORECASE,
+    )
+    if not match:
+        return 0
+    hours = int(match.group(1)) if match.group(1) else 0
+    minutes = int(match.group(2)) if match.group(2) else 0
+    return hours * 60 + minutes
+
+
+def extract_remaining_count(dom: lxml.html.HtmlElement, event: str) -> int:
+    selector = (
+        '//div[@id="pets-remaining"]/text()'
+        if event == "Pound"
+        else '//div[@id="items-remaining"]/text()'
+    )
+    remaining_text = get_first_text(dom, selector)
+
+    match = re.search(r"\d+", remaining_text)
+    return int(match.group()) if match else 0
