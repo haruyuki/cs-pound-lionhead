@@ -19,7 +19,7 @@ import cogs
 load_dotenv()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
-GUILD_ID = int(os.getenv("DEV_GUILD_ID"))
+GUILD_ID = int(os.getenv("DEV_GUILD_ID") or 0)
 
 
 class Bot(commands.Bot):

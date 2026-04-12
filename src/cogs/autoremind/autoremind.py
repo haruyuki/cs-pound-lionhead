@@ -44,8 +44,8 @@ class AutoRemindCog(commands.Cog):
             return
 
         user_id = int(interaction.user.id)
-        channel_id = int(interaction.channel_id) if interaction.channel_id else 0
-        server_id = int(interaction.guild_id) if interaction.guild_id else 0
+        channel_id = interaction.channel_id or 0
+        server_id = interaction.guild_id or 0
         event_type = event.value
 
         async with self.bot.autoremind_db_pool.acquire() as conn:

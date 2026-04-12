@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
+from typing import Tuple
 from urllib.parse import urlparse, parse_qs
 
 import discord
