@@ -31,24 +31,25 @@ async def get_opening_status(
         dom = lxml.html.fromstring(text)
 
     event_header = normalise(get_first_text(dom, '//div[@id="csbody"]//h2[1]/text()'))
-
+    has_pick_countdown = bool(dom.xpath('//*[@id="pound-pick-countdown"]'))
+    has_open_countdown = bool(dom.xpath('//*[@id="pound-open-countdown"]'))
     countdown_text = normalise(
         get_first_text(dom, '//*[@id="pound-open-countdown"]/text()')
     )
     event_type = get_event_type(event_header)
 
-    closed_minutes = extract_minutes(countdown_text)
-    if closed_minutes != 0:
+    if has_pick_countdown:
+        event = event_type or event_header.removeprefix("The ")
+        remaining_count = extract_remaining_count(dom, event)
+        return OpeningOpen(
+            is_open=True, event_type=event, remaining_count=remaining_count
+        )
+
+    if has_open_countdown:
         return OpeningClosed(
             is_open=False,
             event_type=event_type,
-            remaining_minutes=closed_minutes,
-        )
-
-    if event_header == "The Pound" or event_header == "The Lost and Found":
-        remaining_count = extract_remaining_count(dom, event_type)
-        return OpeningOpen(
-            is_open=True, event_type=event_type, remaining_count=remaining_count
+            remaining_minutes=extract_minutes(countdown_text),
         )
 
     return OpeningClosed(
@@ -65,30 +66,35 @@ def get_first_text(dom: lxml.html.HtmlElement, xpath: str) -> str:
     return str(values[0]) if values else ""
 
 
-def get_event_type(text: str) -> str:
-    return "Pound" if "pound" in text.lower() else "Lost and Found"
+def get_event_type(text: str) -> str | None:
+    lowered = text.lower()
+    if "lost and found" in lowered:
+        return "Lost and Found"
+    if "pound" in lowered:
+        return "Pound"
+    return None
 
 
-def extract_minutes(text: str) -> int:
+def extract_minutes(text: str) -> int | None:
     match = re.search(
         r"(?:pound|lost and found).*?(?:in:|within)\s*(?:(\d+)\s*hours?)?\s*(?:,?\s*(\d+)\s*minutes?)?",
         text,
         re.IGNORECASE,
     )
     if not match:
-        return 0
+        return None
     hours = int(match.group(1)) if match.group(1) else 0
     minutes = int(match.group(2)) if match.group(2) else 0
     return hours * 60 + minutes
 
 
-def extract_remaining_count(dom: lxml.html.HtmlElement, event: str) -> int:
-    selector = (
-        '//div[@id="pets-remaining"]/text()'
-        if event == "Pound"
-        else '//div[@id="items-remaining"]/text()'
-    )
-    remaining_text = get_first_text(dom, selector)
+def extract_remaining_count(dom: lxml.html.HtmlElement, event: str | None) -> int:
+    if event == "Pound":
+        remaining_text = normalise(dom.xpath('string(//*[@id="pets-remaining"])'))
+    else:  # Lost and Found
+        remaining_text = normalise(dom.xpath('string(//*[@id="items-remaining"])'))
 
-    match = re.search(r"\d+", remaining_text)
-    return int(match.group()) if match else 0
+    match = re.search(r"\d[\d,]*", remaining_text)
+    if match:
+        return int(match.group().replace(",", ""))
+    return 0
