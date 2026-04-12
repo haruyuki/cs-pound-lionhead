@@ -51,7 +51,7 @@ class UpdateDbCog(commands.Cog):
         table: Literal["pets", "items"],
     ) -> None:
         await interaction.response.send_message(
-            f"Fetching events for {table} database of year {year}..."
+            f"Preparing updating {table} database for year {year}..."
         )
 
         event_links = await fetch_event_links(self.bot.web_client, year, table)
@@ -144,10 +144,7 @@ class UpdateDbCog(commands.Cog):
 
                 await asyncio.sleep(1)
 
-        embed.description = (
-            f"✅ Update complete for {table} database of year {year}!\n"
-            f"Total: {total_added} {table} added"
-        )
+        embed.description = f"Update complete. Total {total_added} {table} added"
         embed.colour = discord.Color.green()
         await interaction.edit_original_response(embeds=[embed])
 
