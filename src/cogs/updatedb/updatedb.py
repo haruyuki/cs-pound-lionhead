@@ -10,7 +10,7 @@ from discord import app_commands
 from discord.ext import commands
 from typing import Literal
 
-from src.utils.update_archive import (
+from src.cogs.updatedb.update_archive import (
     ArchiveEvent,
     get_category,
     fetch_event_links,
