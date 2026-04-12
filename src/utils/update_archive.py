@@ -23,14 +23,9 @@ MONTHS = {
     "November",
     "December",
 }
-ITEM_ID_PATTERN = re.compile(r"/item/(\d+)&p=(\d+)")
-EVENT_TITLE_PATTERN = re.compile(r"^/archive/\d{4}/(?P<event>[^/]+)(?:/Items)?/?$")
 
 CSS_PET_GROUP = ".archive-pet-tree-container"
 CSS_ITEM_GROUP = ".archive-item-group"
-
-SQL_UPSERT_PET = "INSERT OR REPLACE INTO Pets (petID, petYear, petEvent, petLink) VALUES (?, ?, ?, ?)"
-SQL_UPSERT_ITEM = "INSERT OR REPLACE INTO Items (itemLID, itemRID, itemName, itemYear, itemEvent, itemLink) VALUES (?, ?, ?, ?, ?, ?)"
 
 EXCEPTIONS = {
     "3B46301A6C8B850D87A730DA365B0960",
@@ -56,7 +51,8 @@ class ArchiveEvent:
 
 
 def get_event_title(link: str) -> str:
-    match = EVENT_TITLE_PATTERN.match(link)
+    pattern = re.compile(r"^/archive/\d{4}/(?P<event>[^/]+)(?:/Items)?/?$")
+    match = pattern.match(link)
     if not match:
         return "Unknown Event"
     return unquote(match.group("event"))
@@ -82,7 +78,8 @@ async def fetch_event_links(
 
 def parse_item_ids(image_link: str) -> tuple[int | None, int | None]:
     parsed = urlparse(image_link)
-    match = ITEM_ID_PATTERN.search(parsed.path)
+    pattern = re.compile(r"/item/(\d+)&p=(\d+)")
+    match = pattern.search(parsed.path)
     if match:
         return int(match.group(1)), int(match.group(2))
 
@@ -165,7 +162,7 @@ async def process_page(
                     continue
 
                 await conn.execute(
-                    SQL_UPSERT_PET,
+                    "INSERT OR REPLACE INTO Pets (petID, petYear, petEvent, petLink) VALUES (?, ?, ?, ?)",
                     (pet_id, year, event_title, stored_page_link),
                 )
                 added_count += 1
@@ -180,7 +177,7 @@ async def process_page(
 
                 name = item.cssselect("div.item-name")[0].text_content().strip()
                 await conn.execute(
-                    SQL_UPSERT_ITEM,
+                    "INSERT OR REPLACE INTO Items (itemLID, itemRID, itemName, itemYear, itemEvent, itemLink) VALUES (?, ?, ?, ?, ?, ?)",
                     (
                         left_id,
                         right_id,

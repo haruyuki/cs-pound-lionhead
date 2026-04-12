@@ -28,8 +28,6 @@ CATEGORY_DATA = {
     "special": (1, CATEGORY_NAMES["special"]),
 }
 
-DEFAULT_EVENT_STATUS = "⏳ Waiting"
-
 
 class UpdateDbCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -186,7 +184,7 @@ def format_embed_value(
     processing_status: dict[str, str],
 ) -> str:
     return "\n".join(
-        f"{event.title}: {processing_status.get(event.link, DEFAULT_EVENT_STATUS)}"
+        f"{event.title}: {processing_status.get(event.link, "⏳ Waiting")}"
         for event in events
     )
 
