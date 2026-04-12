@@ -59,7 +59,7 @@ class AutoRemindCog(commands.Cog):
                     (channel_id, server_id, minutes, user_id),
                 )
             else:
-                pound = minutes if event_type == "Pound" else 0
+                pound = minutes if event_type == "pound" else 0
                 laf = minutes if event_type == "laf" else 0
                 await conn.execute(
                     "INSERT INTO AutoRemind (userID, channelID, serverID, pound, laf) VALUES (?, ?, ?, ?, ?)",

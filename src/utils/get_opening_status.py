@@ -56,7 +56,7 @@ async def get_opening_status(
         opening_string,
     )
     if match:  # If either Pound or Lost and Found is closed
-        event = "Pound" if match.group(1) == "pound" else "Lost and Found"
+        event = "Pound" if match.group(1) == "Pound" else "Lost and Found"
         hours = int(match.group(2)) if match.group(2) else 0
         minutes = int(match.group(3)) if match.group(3) else 0
         total_minutes = hours * 60 + minutes
