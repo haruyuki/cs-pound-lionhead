@@ -94,6 +94,7 @@ class UpdateDbCog(commands.Cog):
             value=format_embed_value(special_events, processing_status),
             inline=False,
         )
+        embed.colour = discord.Color.yellow()
         embed.timestamp = discord.utils.utcnow()
 
         await interaction.edit_original_response(
