@@ -75,19 +75,6 @@ def get_event_type(text: str) -> str | None:
     return None
 
 
-def extract_minutes(text: str) -> int | None:
-    match = re.search(
-        r"(?:pound|lost and found).*?(?:in:|within)\s*(?:(\d+)\s*hours?)?\s*(?:,?\s*(\d+)\s*minutes?)?",
-        text,
-        re.IGNORECASE,
-    )
-    if not match:
-        return None
-    hours = int(match.group(1)) if match.group(1) else 0
-    minutes = int(match.group(2)) if match.group(2) else 0
-    return hours * 60 + minutes
-
-
 def extract_remaining_count(dom: lxml.html.HtmlElement, event: str | None) -> int:
     if event == "Pound":
         remaining_text = normalise(dom.xpath('string(//*[@id="pets-remaining"])'))
