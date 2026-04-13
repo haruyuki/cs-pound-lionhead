@@ -5,7 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from src.utils import get_opening_status
-from src.utils.get_opening_status import OpeningStatus
+from src.utils.get_opening_status import OpeningClosed
 
 
 class TimeCog(commands.Cog):
@@ -32,21 +32,18 @@ class TimeCog(commands.Cog):
             await interaction.response.send_message(message)
 
 
-def format_message(status: OpeningStatus) -> str:
+def format_message(status: OpeningClosed) -> str:
     hours, minutes = divmod(status.remaining_minutes, 60)
 
-    message = (
-        f"The {status.event_type} will open "  # The (Pound/Lost and Found) will open
-    )
-    if hours > 0:
-        message += f"{'within' if hours > 1 else 'in:'} {hours} {'hours' if hours > 1 else 'hour'}"  # (within/in:) X hour(s)
+    parts: list[str] = []
+    if hours:
+        parts.append(f"{hours} {'hour' if hours == 1 else 'hours'}")
+    if minutes:
+        parts.append(f"{minutes} {'minute' if minutes == 1 else 'minutes'}")
 
-    if minutes > 0:
-        if hours > 0:
-            message += f", {minutes} {'minutes' if minutes > 1 else 'minute'}."  # , X minute(s).
-        else:
-            message = f"in: {minutes} {'minutes' if minutes > 1 else 'minute'}."  # in: X minute(s).
-    elif hours > 0:
-        message += "."
+    if not parts:
+        return f"The {status.event_type} will open soon."
+    if len(parts) == 1:
+        return f"The {status.event_type} will open in {parts[0]}."
 
-    return message
+    return f"The {status.event_type} will open in {parts[0]} and {parts[1]}."
