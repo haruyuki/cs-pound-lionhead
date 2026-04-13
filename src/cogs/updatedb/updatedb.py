@@ -56,11 +56,11 @@ class UpdateDbCog(commands.Cog):
 
         event_links = await fetch_event_links(self.bot.web_client, year, table)
 
-        events: list[ArchiveEvent] = []
-        monthly_events: list[ArchiveEvent] = []
-        special_events: list[ArchiveEvent] = []
-        processing_status: dict[str, str] = {}
-        embed_bucket: dict[str, tuple[list[ArchiveEvent], int, str]] = {}
+        events = []
+        monthly_events = []
+        special_events = []
+        processing_status = {}
+        embed_bucket = {}
         for event in event_links:
             clean_link = unquote(event.split("?")[0])
 

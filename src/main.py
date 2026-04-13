@@ -64,7 +64,7 @@ class Bot(commands.Bot):
                 logging.error("Login failed. Some features may not work properly.")
 
         for extension in self.initial_extensions:
-            logging.info(f"Loading extension: {extension}")
+            logging.info("Loading extension: %s", extension)
             await self.load_extension(extension)
 
         guild = discord.Object(id=GUILD_ID)
@@ -77,7 +77,7 @@ class Bot(commands.Bot):
         logging.info("Bot setup complete")
 
     async def on_ready(self):
-        logging.info(f"Logged in as {self.user} (ID: {self.user.id})")
+        logging.info("Logged in as %s (ID: %s)", self.user, self.user.id)
         logging.info("------")
 
     async def close(self) -> None:
