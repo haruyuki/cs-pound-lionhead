@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import re
 
 import discord
 from discord import app_commands
 from discord.ext import commands
+
+logger = logging.getLogger(__name__)
 
 
 class RemindMeCog(commands.Cog):
@@ -41,10 +44,15 @@ class RemindMeCog(commands.Cog):
             f"A reminder has been set for you in {amount}.", ephemeral=True
         )
 
+        channel_id = interaction.channel_id
+        if channel_id is None:
+            logger.warning("Interaction has no channel ID, cannot set reminder")
+            return
+
         task = asyncio.create_task(
             self.send_reminder(
                 delay_seconds=total_seconds,
-                channel_id=interaction.channel_id,
+                channel_id=channel_id,
                 user_mention=interaction.user.mention,
                 amount=amount,
             )
