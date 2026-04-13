@@ -1,4 +1,5 @@
 import re
+import math
 from dataclasses import dataclass
 
 import aiohttp
@@ -34,10 +35,9 @@ async def get_opening_status(
         normalise(get_first_text(dom, '//div[@id="csbody"]//h2[1]/text()'))
     )
     has_pick_countdown = bool(dom.xpath('//*[@id="pound-pick-countdown"]'))
-    has_open_countdown = bool(dom.xpath('//*[@id="pound-open-countdown"]'))
-    countdown_text = normalise(
-        get_first_text(dom, '//*[@id="pound-open-countdown"]/text()')
-    )
+
+    script_match = re.search(r'"timeTillOpen_ms"\s*:\s*(\d+)', text)
+    remaining_ms = int(script_match.group(1)) if script_match else None
 
     if has_pick_countdown:
         remaining_count = extract_remaining_count(dom, event_type)
@@ -45,11 +45,11 @@ async def get_opening_status(
             is_open=True, event_type=event_type, remaining_count=remaining_count
         )
 
-    if has_open_countdown:
+    if remaining_ms is not None:
         return OpeningClosed(
             is_open=False,
             event_type=event_type,
-            remaining_minutes=extract_minutes(countdown_text),
+            remaining_minutes=max(0, math.floor(remaining_ms / 60000)),
         )
 
     return OpeningClosed(
