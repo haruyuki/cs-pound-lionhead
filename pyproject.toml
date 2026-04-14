@@ -9,6 +9,8 @@ dependencies = [
     "cssselect>=1.4.0",
     "discord-py>=2.7.1",
     "lxml==6.0.4",
+    "pillow>=12.2.0",
+    "pymongo>=4.16.0",
     "python-dotenv>=1.2.2",
 ]
 
