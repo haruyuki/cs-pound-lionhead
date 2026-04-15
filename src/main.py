@@ -13,8 +13,12 @@ import discord
 import lxml.html
 from discord.ext import commands
 from dotenv import load_dotenv
+from pymongo import AsyncMongoClient
+from pymongo.asynchronous.collection import AsyncCollection
 
 import cogs
+from tasks import autoremind_task, initialize_reminder_times
+from utils import chickensmoothie_login, mongodb_login
 
 load_dotenv()
 
@@ -28,14 +32,16 @@ class Bot(commands.Bot):
         *args,
         initial_extensions: List[str],
         archive_db_pool: asqlite.Pool,
-        autoremind_db_pool: asqlite.Pool,
+        autoremind_client: AsyncMongoClient,
+        autoremind_collection: AsyncCollection,
         web_client: aiohttp.ClientSession,
         **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.initial_extensions = initial_extensions
         self.archive_db_pool = archive_db_pool
-        self.autoremind_db_pool = autoremind_db_pool
+        self.autoremind_client = autoremind_client
+        self.autoremind_collection = autoremind_collection
         self.web_client = web_client
 
     async def setup_hook(self):
@@ -67,6 +73,9 @@ class Bot(commands.Bot):
             logging.info("Loading extension: %s", extension)
             await self.load_extension(extension)
 
+        await initialize_reminder_times(self.autoremind_collection)
+        self.loop.create_task(autoremind_task(self))
+
         guild = discord.Object(id=GUILD_ID)
         self.tree.copy_global_to(guild=guild)
         await self.tree.sync(guild=guild)
@@ -82,7 +91,9 @@ class Bot(commands.Bot):
 
     async def close(self) -> None:
         await self.archive_db_pool.close()
-        await self.autoremind_db_pool.close()
+        close_result = self.autoremind_client.close()
+        if asyncio.iscoroutine(close_result):
+            await close_result
         if self.web_client:
             await self.web_client.close()
         await super().close()
@@ -125,11 +136,14 @@ async def main():
         intents = discord.Intents.default()
         intents.message_content = True
         archive_db_pool = await asqlite.create_pool("../chickensmoothie.db")
-        autoremind_db_pool = await asqlite.create_pool("../autoremind.db")
-        async with Bot(
+
+        autoremind_client, autoremind_collection = await mongodb_login()
+
+        bot = Bot(
             commands.when_mentioned,
             archive_db_pool=archive_db_pool,
-            autoremind_db_pool=autoremind_db_pool,
+            autoremind_client=autoremind_client,
+            autoremind_collection=autoremind_collection,
             web_client=our_client,
             initial_extensions=extensions,
             intents=intents,
