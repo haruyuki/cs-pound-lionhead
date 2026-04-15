@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 import asyncio
-import os
 import logging
 import logging.handlers
+import os
 import sys
 from typing import List
 
 import aiohttp
 import asqlite
 import discord
-import lxml.html
 from discord.ext import commands
 from dotenv import load_dotenv
 from pymongo import AsyncMongoClient
@@ -45,29 +44,7 @@ class Bot(commands.Bot):
         self.web_client = web_client
 
     async def setup_hook(self):
-        payload = {
-            "username": os.getenv("CS_USERNAME"),
-            "password": os.getenv("CS_PASSWORD"),
-            "redirect": "index.php",
-            "autologin": "on",
-            "login": "Login",
-        }
-
-        logging.debug("Performing login...")
-        async with self.web_client.post(
-            "/Forum/ucp.php?mode=login", data=payload
-        ) as resp:
-            resp.raise_for_status()
-            text = await resp.text()
-            dom = lxml.html.fromstring(text)
-            login_message = dom.xpath('//div[@id="message"]//p/text()')
-            if (
-                login_message
-                and login_message[0] == "You have been successfully logged in."
-            ):
-                logging.info("Login successful.")
-            else:
-                logging.error("Login failed. Some features may not work properly.")
+        await chickensmoothie_login(self.web_client)
 
         for extension in self.initial_extensions:
             logging.info("Loading extension: %s", extension)
@@ -147,8 +124,13 @@ async def main():
             web_client=our_client,
             initial_extensions=extensions,
             intents=intents,
-        ) as bot:
+        )
+
+        assert TOKEN is not None
+        try:
             await bot.start(TOKEN)
+        finally:
+            await bot.close()
 
 
 if __name__ == "__main__":
