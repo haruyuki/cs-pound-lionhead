@@ -39,13 +39,13 @@ FORESEE_COUNT = 4
 
 
 class ProgenyCog(commands.Cog):
+    def __init__(self, bot: commands.Bot) -> None:
+        self.bot = bot
+
     flightrising = app_commands.Group(
         name="flightrising",
         description="Flight Rising related commands",
     )
-
-    def __init__(self, bot: commands.Bot) -> None:
-        self.bot = bot
 
     @flightrising.command(
         name="progeny",
