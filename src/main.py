@@ -16,7 +16,7 @@ from pymongo import AsyncMongoClient
 from pymongo.asynchronous.collection import AsyncCollection
 
 import cogs
-from tasks import autoremind_task, initialize_reminder_times
+from tasks import autoremind_task, initialize_reminder_times, rss_feed_task
 from utils import chickensmoothie_login, mongodb_login
 
 load_dotenv()
@@ -52,6 +52,7 @@ class Bot(commands.Bot):
 
         await initialize_reminder_times(self.autoremind_collection)
         self.loop.create_task(autoremind_task(self))
+        self.loop.create_task(rss_feed_task(self))
 
         guild = discord.Object(id=GUILD_ID)
         self.tree.copy_global_to(guild=guild)
