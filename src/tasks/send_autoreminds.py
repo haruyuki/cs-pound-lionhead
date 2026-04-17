@@ -157,7 +157,7 @@ async def dispatch_minute_reminders(
 
     channel_user_ids = defaultdict(list)
     for document in documents:
-        channel_user_ids[int(document["channel_id"])].append(int(document["user_id"]))
+        channel_user_ids[document["channel_id"]].append(document["user_id"])
 
     tasks = []
     for channel_index, (channel_id, user_ids) in enumerate(channel_user_ids.items()):
@@ -260,12 +260,12 @@ async def get_autoremind_documents(
     collection, minutes_remaining: int, opening_type: str
 ) -> list[dict[str, int]]:
     cursor = collection.find(
-        {opening_type: minutes_remaining}, {"_id": 1, "channel_id": 1}
+        {opening_type: minutes_remaining}, {"user_id": 1, "channel_id": 1}
     )
     documents = await cursor.to_list(length=None)
 
     return [
-        {"user_id": int(document["_id"]), "channel_id": int(document["channel_id"])}
+        {"user_id": document["user_id"], "channel_id": document["channel_id"]}
         for document in documents
     ]
 
