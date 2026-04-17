@@ -11,12 +11,17 @@ logging = logging.getLogger(__name__)
 async def mongodb_login() -> tuple[AsyncMongoClient, AsyncCollection]:
     logging.info("Connecting to MongoDB...")
     autoremind_client = AsyncMongoClient(os.getenv("MONGODB_URI"))
-    try:
-        await autoremind_client.admin.command("ping")
-        logging.info("MongoDB connection successful.")
-    except PyMongoError:
-        logging.exception("MongoDB connection failed.")
-        raise
+    if not await check_mongodb_status(autoremind_client):
+        raise Exception("MongoDB connection failed.")
+    logging.info("MongoDB connection successful.")
     autoremind_collection = autoremind_client["cs_pound"]["autoremind"]
 
     return autoremind_client, autoremind_collection
+
+
+async def check_mongodb_status(autoremind_client: AsyncMongoClient) -> bool:
+    try:
+        await autoremind_client.admin.command("ping")
+        return True
+    except PyMongoError:
+        return False

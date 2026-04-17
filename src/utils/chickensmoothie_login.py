@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import os
 
@@ -29,6 +28,15 @@ async def chickensmoothie_login(session: aiohttp.ClientSession) -> None:
         ):
             logging.info("ChickenSmoothie login successful.")
         else:
-            logging.error(
-                "ChickenSmoothie login failed. Some features may not work properly."
-            )
+            raise Exception("ChickenSmoothie login failed.")
+
+
+async def check_chickensmoothie_status(session: aiohttp.ClientSession) -> bool:
+    async with session.get("/") as resp:
+        if resp.status == 200:
+            text = await resp.text()
+            dom = lxml.html.fromstring(text)
+            logout_string = dom.xpath('//li[@class="icon-logout"]/a/text()')
+            if logout_string and os.getenv("CS_USERNAME") in logout_string[0]:
+                return True
+        return False
