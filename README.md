@@ -24,14 +24,14 @@ Major releases are named after different breeds of rabbits, while minor releases
 Previous bot versions will keep their original version names:
 - [CS-Pound Async](https://github.com/haruyuki/cs-pound-async) – The initial version of the bot, built using the async branch of discord.py in 2018. Originally created as part of my high school major project.
 - [CS-Pound Rewrite](https://github.com/haruyuki/cs-pound-rewrite) – A rewrite of the bot using the rewrite branch of discord.py in late 2018, featuring improved code structure and new functionality introduced by the rewrite.
-- [CS-Pound JS](https://github.com/haruyuki/cs-pound-js) – A learning-focused rewrite in JavaScript using discord.js in 2024, also partly motivated by accumulated technical debt from the Rewrite version.
+- [CS-Pound JS](https://github.com/haruyuki/cs-pound-js) – A rewrite of the bot to JavaScript using discord.js in 2024, due to potential discontinuation of discordpy and not supporting slash commands (which discord.js does).
 - [CS-Pound Lionhead **(Current)**](https://github.com/haruyuki/cs-pound-lionhead) – Rewritten back in Python using modern discord.py, with a focus on improved performance, maintainability, and long-term stability.
 
 Future major releases will continue to follow the rabbit breed naming convention.
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 – see the [LICENSE](COPYING) file for details.
+This project is licensed under the GNU General Public License v3.0 – see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgements
 Pet and item images shown by the bot are copyright and property of [Chicken Smoothie](https://www.chickensmoothie.com).
