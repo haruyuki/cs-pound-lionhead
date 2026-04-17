@@ -80,7 +80,6 @@ class UpdateDbCog(commands.Cog):
             embed_bucket[event_link] = (event_type, category_index, category_name)
 
         embed = discord.Embed(
-            color=0x00AE86,
             title=f"Updating {table} database for year {year}",
             description=f"Processing events...",
         )
