@@ -66,7 +66,7 @@ class Bot(commands.Bot):
 
     async def on_ready(self):
         logging.info("Logged in as %s (ID: %s)", self.user, self.user.id)
-        logging.info("------")
+        logging.info("----------")
 
     async def close(self) -> None:
         await self.archive_db_pool.close()
@@ -149,4 +149,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, asyncio.CancelledError):
+        pass
