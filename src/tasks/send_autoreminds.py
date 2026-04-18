@@ -120,7 +120,11 @@ async def get_sleep_minutes(session) -> int | None:
     if _STATE.minutes_remaining <= 61:
         _STATE.in_countdown = True
         _STATE.timeout_minutes = 1
-        logger.info("%s opening, switching to self updates", _STATE.opening_type)
+        logger.info(
+            "%s opening in %s minutes, switching to self updates",
+            _STATE.opening_type,
+            _STATE.minutes_remaining,
+        )
         return None
 
     _STATE.timeout_minutes = max(1, _STATE.minutes_remaining - 61)
