@@ -202,7 +202,7 @@ async def update_autoreminds(collection, opening_type: str | None = None) -> Non
             )
             continue
 
-        _AUTOREMIND_TIMES[opening] = {int(v) for v in distinct_values}
+        _AUTOREMIND_TIMES[opening] = {int(v) for v in distinct_values if v != 0}
         logger.info(
             "Updated %s AutoRemind times with %s distinct values",
             opening,

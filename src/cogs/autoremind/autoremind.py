@@ -103,7 +103,7 @@ class AutoRemindCog(commands.Cog):
             )
             return
 
-        previous_autoremind = int(existing.get(event.value, 0) or 0)
+        previous_autoremind = existing.get(event.value, 0)
         await self.bot.autoremind_collection.update_one(
             {"user_id": user_id},
             {"$set": {event.value: 0}},
