@@ -41,6 +41,12 @@ class AutoRemindCog(commands.Cog):
         server_id = interaction.guild_id or 0
         event_type = event.value
 
+        set_on_insert = {
+            "pound": 0,
+            "laf": 0,
+        }
+        set_on_insert.pop(event_type)  # Remove event_type since $set will set it
+
         await self.bot.autoremind_collection.update_one(
             {"user_id": user_id},
             {
@@ -49,10 +55,7 @@ class AutoRemindCog(commands.Cog):
                     "server_id": server_id,
                     event_type: minutes,
                 },
-                "$setOnInsert": {
-                    "pound": 0,
-                    "laf": 0,
-                },
+                "$setOnInsert": set_on_insert,
             },
             upsert=True,
         )
