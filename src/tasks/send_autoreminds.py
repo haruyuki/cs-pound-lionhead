@@ -229,8 +229,12 @@ async def prepare_reminder(
         await send_message(channel, minutes_left, opening_type, user_ids)
     except asyncio.CancelledError:
         raise
-    except Exception:
-        logger.exception("Failed to send reminder to channel %s", channel_id)
+    except Exception as e:
+        logger.error(
+            "Failed to send reminder to channel %s. Reason: %s",
+            channel_id,
+            e,
+        )
 
 
 async def send_message(
