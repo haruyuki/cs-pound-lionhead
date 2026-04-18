@@ -42,7 +42,7 @@ class AutoRemindCog(commands.Cog):
         event_type = event.value
 
         await self.bot.autoremind_collection.update_one(
-            {"_id": user_id},
+            {"user_id": user_id},
             {
                 "$set": {
                     "channel_id": channel_id,
@@ -90,11 +90,9 @@ class AutoRemindCog(commands.Cog):
             )
             return
 
-        user_id = int(interaction.user.id)
+        user_id = interaction.user.id
 
-        existing = await self.bot.autoremind_collection.find_one(
-            {"_id": user_id}, projection={"pound": 1, "laf": 1}
-        )
+        existing = await self.bot.autoremind_collection.find_one({"user_id": user_id})
         if not existing or existing.get(event.value, 0) == 0:
             await interaction.response.send_message(
                 f"No {event.name} AutoRemind was found. Are you sure you have one set up?",
@@ -104,7 +102,7 @@ class AutoRemindCog(commands.Cog):
 
         previous_autoremind = int(existing.get(event.value, 0) or 0)
         await self.bot.autoremind_collection.update_one(
-            {"_id": user_id},
+            {"user_id": user_id},
             {"$set": {event.value: 0}},
         )
 
@@ -114,10 +112,10 @@ class AutoRemindCog(commands.Cog):
         )
 
         updated = await self.bot.autoremind_collection.find_one(
-            {"_id": user_id}, projection={"pound": 1, "laf": 1}
+            {"user_id": user_id}, projection={"pound": 1, "laf": 1}
         )
         if updated and updated.get("pound", 0) == 0 and updated.get("laf", 0) == 0:
-            await self.bot.autoremind_collection.delete_one({"_id": user_id})
+            await self.bot.autoremind_collection.delete_one({"user_id": user_id})
 
         await interaction.response.send_message(
             f"Your {previous_autoremind} minute AutoRemind for the {event.name} has been removed.",
