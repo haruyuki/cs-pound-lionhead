@@ -6,6 +6,7 @@ requires-python = ">=3.13"
 dependencies = [
     "aiohttp>=3.13.5",
     "asqlite==2.0.0",
+    "colorlog>=6.10.1",
     "cssselect>=1.4.0",
     "discord-py>=2.7.1",
     "lxml==6.0.4",

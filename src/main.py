@@ -9,6 +9,7 @@ from typing import List
 
 import aiohttp
 import asqlite
+import colorlog
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -79,11 +80,24 @@ class Bot(commands.Bot):
 
 async def main():
     logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+    logger.handlers.clear()
+    logger.setLevel(logging.DEBUG)
 
     dt_fmt = "%Y-%m-%d %H:%M:%S"
     formatter = logging.Formatter(
-        "[{asctime}] [{levelname:<8}] {name}: {message}", dt_fmt, style="{"
+        "[%(asctime)s] [%(levelname)-8s] %(name)s: %(message)s", dt_fmt
+    )
+
+    colour_formatter = colorlog.ColoredFormatter(
+        "%(log_color)s[%(asctime)s] [%(levelname)-8s] %(name)s: %(message)s",
+        datefmt=dt_fmt,
+        log_colors={
+            "DEBUG": "green",
+            "INFO": "white",
+            "WARNING": "yellow",
+            "ERROR": "red",
+            "CRITICAL": "bold_red",
+        },
     )
 
     file_handler = logging.handlers.RotatingFileHandler(
@@ -97,8 +111,8 @@ async def main():
     logger.addHandler(file_handler)
 
     console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    console_handler.setLevel(logging.DEBUG)  # show INFO+ on console
+    console_handler.setFormatter(colour_formatter)
+    console_handler.setLevel(logging.INFO)
     logger.addHandler(console_handler)
 
     headers = {
