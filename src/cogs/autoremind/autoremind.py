@@ -18,7 +18,7 @@ class AutoRemindCog(commands.Cog):
         self.bot = bot
 
     @autoremind.command(
-        name="set", description="Set AutoReminders for the Pound and Lost and Found"
+        name="set", description="Set AutoReminds for the Pound and Lost and Found"
     )
     @app_commands.describe(
         event="Reminder for Pound or Lost and Found?",
@@ -63,15 +63,16 @@ class AutoRemindCog(commands.Cog):
             minutes,
         )
 
+        event_label = "Pound" if event_type == "pound" else "Lost and Found"
         minutes_label = "minute" if minutes == 1 else "minutes"
 
         await interaction.response.send_message(
-            f"Your {'Pound' if event_type == 'pound' else 'Lost and Found'} auto remind has been set to {minutes} {minutes_label} in channel <#{channel_id}>.",
+            f"Your {event_label} AutoRemind has been set to {minutes} {minutes_label} in <#{channel_id}> channel.",
             ephemeral=True,
         )
 
     @autoremind.command(
-        name="remove", description="Cancel auto reminders for the pound and laf"
+        name="remove", description="Cancel AutoReminds for the pound and laf"
     )
     @app_commands.choices(
         event=[
@@ -96,7 +97,7 @@ class AutoRemindCog(commands.Cog):
         )
         if not existing or existing.get(event.value, 0) == 0:
             await interaction.response.send_message(
-                "No reminder was found. Are you sure you have an AutoRemind set up?",
+                f"No {event.name} AutoRemind was found. Are you sure you have one set up?",
                 ephemeral=True,
             )
             return
@@ -119,6 +120,6 @@ class AutoRemindCog(commands.Cog):
             await self.bot.autoremind_collection.delete_one({"_id": user_id})
 
         await interaction.response.send_message(
-            f"Your {previous_autoremind} minute AutoReminder for the {event.name} has been removed.",
+            f"Your {previous_autoremind} minute AutoRemind for the {event.name} has been removed.",
             ephemeral=True,
         )

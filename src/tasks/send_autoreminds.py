@@ -31,16 +31,16 @@ _AUTOREMIND_TIMES = {opening_type: set() for opening_type in SUPPORTED_OPENING_T
 
 async def autoremind_task(bot) -> None:
     await bot.wait_until_ready()
-    logger.info("Autoremind background task started")
+    logger.info("AutoRemind background task started")
 
     while not bot.is_closed():
         try:
             _STATE.timeout_minutes = await run_task(bot)
         except asyncio.CancelledError:
-            logger.info("Autoremind background task cancelled")
+            logger.info("AutoRemind background task cancelled")
             raise
         except Exception:
-            logger.exception("Error in autoremind background task")
+            logger.exception("Error in AutoRemind background task")
             _STATE.timeout_minutes = 1
 
         await asyncio.sleep(_STATE.timeout_minutes * 60)
@@ -204,7 +204,7 @@ async def update_autoreminds(collection, opening_type: str | None = None) -> Non
 
         _AUTOREMIND_TIMES[opening] = {int(v) for v in distinct_values}
         logger.info(
-            "Updated %s autoremind times with %s distinct values",
+            "Updated %s AutoRemind times with %s distinct values",
             opening,
             len(_AUTOREMIND_TIMES[opening]),
         )
@@ -283,4 +283,4 @@ async def reset_state() -> None:
     _STATE.timeout_minutes = DEFAULT_POLL_MINUTES
     _STATE.opening_type = None
     _STATE.minutes_remaining = 0
-    logger.info("Autoremind countdown state reset complete")
+    logger.info("AutoRemind countdown state reset complete")
