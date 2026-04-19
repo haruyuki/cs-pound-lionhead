@@ -13,7 +13,7 @@ async def rss_feed_task(bot):
     while not bot.is_closed():
         try:
             logger.info("Updating RSS feed...")
-            reader = make_reader("../db.sqlite")
+            reader = make_reader("db.sqlite")
             await asyncio.to_thread(reader.add_feed, feed_url, exist_ok=True)
             await asyncio.to_thread(reader.update_feeds)
             logger.info("RSS feed updated.")
