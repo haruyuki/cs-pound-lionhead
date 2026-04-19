@@ -28,7 +28,7 @@ class NewsCog(
         reader = make_reader("db.sqlite")
         feed = reader.get_feed(feed_url)
         logger.info("Read %s (Last changed at %s)", feed.title, feed.updated)
-        latest = list(reader.get_entries(feed=feed_url, read=False))[9]
+        latest = list(reader.get_entries(feed=feed_url, read=False))[0]
         news_title = latest.title
         news_content = md(latest.summary)
         news_link = latest.link
