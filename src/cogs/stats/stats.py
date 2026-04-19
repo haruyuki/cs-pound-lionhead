@@ -77,6 +77,6 @@ class StatsCog(commands.Cog):
 
 
 def get_bot_version():
-    with open("../pyproject.toml", "rb") as f:
+    with open("pyproject.toml", "rb") as f:
         data = tomllib.load(f)
     return data["project"]["version"]
