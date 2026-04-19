@@ -25,7 +25,7 @@ class NewsCog(
     )
     async def latest(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer(thinking=True)
-        reader = make_reader("../db.sqlite")
+        reader = make_reader("db.sqlite")
         feed = reader.get_feed(feed_url)
         logger.info("Read %s (Last changed at %s)", feed.title, feed.updated)
         latest = list(reader.get_entries(feed=feed_url, read=False))[9]
