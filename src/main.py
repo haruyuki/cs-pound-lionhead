@@ -107,7 +107,7 @@ async def main():
         backupCount=5,
     )
     file_handler.setFormatter(formatter)
-    file_handler.setLevel(logging.DEBUG)
+    file_handler.setLevel(logging.INFO)
     logger.addHandler(file_handler)
 
     console_handler = logging.StreamHandler(sys.stdout)
