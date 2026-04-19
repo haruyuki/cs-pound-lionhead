@@ -35,9 +35,9 @@ class AutoRemindCog(
         event: Choice[str],
         minutes: app_commands.Range[int, 1, 60],
     ) -> None:
-        user_id = int(interaction.user.id)
-        channel_id = interaction.channel_id or 0
-        server_id = interaction.guild_id or 0
+        user_id = str(interaction.user.id)
+        channel_id = str(interaction.channel_id or 0)
+        server_id = str(interaction.guild_id or 0)
         event_type = event.value
 
         set_on_insert = {
@@ -92,7 +92,7 @@ class AutoRemindCog(
             )
             return
 
-        user_id = interaction.user.id
+        user_id = str(interaction.user.id)
 
         existing = await self.bot.autoremind_collection.find_one({"user_id": user_id})
         if not existing or existing.get(event.value, 0) == 0:

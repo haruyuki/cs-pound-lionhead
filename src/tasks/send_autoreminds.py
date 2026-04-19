@@ -273,7 +273,7 @@ async def get_autoremind_documents(
     documents = await cursor.to_list(length=None)
 
     return [
-        {"user_id": document["user_id"], "channel_id": document["channel_id"]}
+        {"user_id": int(document["user_id"]), "channel_id": int(document["channel_id"])}
         for document in documents
     ]
 
