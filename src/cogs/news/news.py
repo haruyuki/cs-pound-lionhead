@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import logging
 import re
 
@@ -24,20 +25,26 @@ class NewsCog(
         name="latest", description="Show the latest ChickenSmoothie news"
     )
     async def latest(self, interaction: discord.Interaction) -> None:
-        await interaction.response.defer(thinking=True)
+        await interaction.response.defer(thinking=True, ephemeral=True)
         reader = make_reader("db.sqlite")
         feed = reader.get_feed(feed_url)
         logger.info("Read %s (Last changed at %s)", feed.title, feed.updated)
         latest = list(reader.get_entries(feed=feed_url, read=False))[0]
-        news_title = latest.title
-        news_content = md(latest.summary)
-        news_link = latest.link
-        embed = discord.Embed(
-            title=news_title, description=news_content, color=0xE0F6B2, url=news_link
-        )
+        news_title = f"### [{latest.title}]({latest.link})"
+        news_content = f"{news_title}\n{md(latest.summary)}"
+
         if latest_img := extract_first_img(latest.summary):
-            embed.set_image(url=latest_img)
-        await interaction.edit_original_response(embed=embed)
+            async with self.bot.web_client.get(latest_img) as resp:
+                resp.raise_for_status()
+                img = await resp.read()
+                with io.BytesIO(img) as file:
+                    await interaction.channel.send(
+                        file=discord.File(file, filename="image.png"),
+                        content=news_content,
+                    )
+        else:
+            await interaction.channel.send(news_content)
+        await interaction.edit_original_response(content="Latest news sent!")
 
 
 def extract_first_img(html: str) -> str | None:
@@ -66,7 +73,7 @@ class CustomMarkdownConverter(MarkdownConverter):
     def convert_span(self, el, text, parent_tags):
         style = el.attrs.get("style", None) or ""
         if "font-size: 150%" in style:
-            return f"## {text}\n"
+            return f"# {text}\n"
         if "font-weight: bold" in style:
             return f"**{text}**"
         return text
