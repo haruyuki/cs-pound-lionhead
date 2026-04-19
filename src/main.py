@@ -126,7 +126,7 @@ async def main():
         extensions = list(cogs.iter_cogs())
         extensions.append("jishaku")
         intents = discord.Intents.default()
-        intents.message_content = True
+        intents.members = True
         archive_db_pool = await asqlite.create_pool("chickensmoothie.db")
 
         autoremind_client, autoremind_collection = await mongodb_login()
@@ -139,6 +139,7 @@ async def main():
             web_client=our_client,
             initial_extensions=extensions,
             intents=intents,
+            chunk_guilds_at_startup=False,
         )
 
         assert TOKEN is not None
