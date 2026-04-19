@@ -65,10 +65,16 @@ class CustomMarkdownConverter(MarkdownConverter):
         return ""  # Strip image
 
     def convert_br(self, el, text, parent_tags):
+        prev = el.previous_sibling
+        prev_text = ""
+        if prev is not None:
+            prev_text = getattr(prev, "text", str(prev)).strip()
+        if prev_text.endswith(":"):
+            return ""  # Skip this <br>
         if self._skip_next_br > 0:
             self._skip_next_br -= 1
             return ""  # Skip this <br>
-        return super().convert_br(el, text, parent_tags)
+        return "\n"
 
     def convert_span(self, el, text, parent_tags):
         style = el.attrs.get("style", None) or ""
