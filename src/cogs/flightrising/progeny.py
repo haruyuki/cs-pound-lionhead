@@ -38,16 +38,13 @@ CUSTOM_URL = "https://www1.flightrising.com/scrying/ajax-predict"
 FORESEE_COUNT = 4
 
 
-class ProgenyCog(commands.Cog):
+class ProgenyCog(
+    commands.GroupCog, name="flightrising", description="Flight Rising related commands"
+):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    flightrising = app_commands.Group(
-        name="flightrising",
-        description="Flight Rising related commands",
-    )
-
-    @flightrising.command(
+    @app_commands.command(
         name="progeny",
         description="See the possible offspring of two dragons",
     )

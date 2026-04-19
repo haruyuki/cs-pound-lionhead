@@ -14,16 +14,15 @@ feed_url = "https://chickensmoothie.com/rss.php?feed=news"
 logger = logging.getLogger(__name__)
 
 
-class NewsCog(commands.Cog):
+class NewsCog(
+    commands.GroupCog, name="news", description="ChickenSmoothie news related commands"
+):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    news = app_commands.Group(
-        name="news",
-        description="ChickenSmoothie news related commands",
+    @app_commands.command(
+        name="latest", description="Show the latest ChickenSmoothie news"
     )
-
-    @news.command(name="latest", description="Show the latest ChickenSmoothie news")
     async def latest(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer(thinking=True)
         reader = make_reader("../db.sqlite")

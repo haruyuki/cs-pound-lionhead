@@ -8,16 +8,15 @@ from discord.ext import commands
 from tasks import autoremind_remove_handler, autoremind_add_handler
 
 
-class AutoRemindCog(commands.Cog):
-    autoremind = app_commands.Group(
-        name="autoremind",
-        description="AutoRemind related commands",
-    )
-
+class AutoRemindCog(
+    commands.GroupCog,
+    group_name="autoremind",
+    group_description="AutoRemind related commands",
+):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @autoremind.command(
+    @app_commands.command(
         name="set", description="Set AutoReminds for the Pound and Lost and Found"
     )
     @app_commands.describe(
@@ -74,7 +73,7 @@ class AutoRemindCog(commands.Cog):
             ephemeral=True,
         )
 
-    @autoremind.command(
+    @app_commands.command(
         name="remove", description="Cancel AutoReminds for the pound and laf"
     )
     @app_commands.choices(
