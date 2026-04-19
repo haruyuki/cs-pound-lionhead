@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import re
 from typing import Tuple
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs, quote
 
 import discord
 from discord import app_commands
@@ -145,4 +145,4 @@ def prepare_message(
     name_part = f"**{name}** " if name else ""
     event_part = f"{event} {year}" if is_month else f"{year} {event}"
 
-    return f"That {entity_type} is {name_part}from {event_part}.\nArchive Link: {link}"
+    return f"That {entity_type} is {name_part}from {event_part}.\nArchive Link: {quote(link,safe=":/?=")}"
