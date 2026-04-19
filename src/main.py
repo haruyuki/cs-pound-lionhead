@@ -101,7 +101,7 @@ async def main():
     )
 
     file_handler = logging.handlers.RotatingFileHandler(
-        filename="../discord.log",
+        filename="discord.log",
         encoding="utf-8",
         maxBytes=32 * 1024 * 1024,  # 32 MiB
         backupCount=5,
@@ -127,7 +127,7 @@ async def main():
         extensions.append("jishaku")
         intents = discord.Intents.default()
         intents.message_content = True
-        archive_db_pool = await asqlite.create_pool("../chickensmoothie.db")
+        archive_db_pool = await asqlite.create_pool("chickensmoothie.db")
 
         autoremind_client, autoremind_collection = await mongodb_login()
 
