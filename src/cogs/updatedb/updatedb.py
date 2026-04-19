@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import datetime
 import logging
+import os
 from urllib.parse import unquote, urljoin
 
 import discord
@@ -28,6 +29,8 @@ CATEGORY_DATA = {
     "special": (1, CATEGORY_NAMES["special"]),
 }
 
+GUILD_ID = int(os.getenv("DEV_GUILD_ID") or 0)
+
 
 class UpdateDbCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -44,6 +47,7 @@ class UpdateDbCog(commands.Cog):
         ]
     )
     @app_commands.default_permissions(administrator=True)
+    @app_commands.guilds(discord.Object(id=GUILD_ID))
     async def updatedb(
         self,
         interaction: discord.Interaction,
