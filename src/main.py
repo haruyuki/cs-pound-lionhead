@@ -55,12 +55,12 @@ class Bot(commands.Bot):
         self.loop.create_task(autoremind_task(self))
         self.loop.create_task(rss_feed_task(self))
 
-        guild = discord.Object(id=GUILD_ID)
-        self.tree.copy_global_to(guild=guild)
-        await self.tree.sync(guild=guild)
-        logging.info("Successfully synced commands to guild")
-        # await self.tree.sync()
-        # logging.info("Successfully synced global commands")
+        # guild = discord.Object(id=GUILD_ID)
+        # self.tree.copy_global_to(guild=guild)
+        # await self.tree.sync(guild=guild)
+        # logging.info("Successfully synced commands to guild")
+        await self.tree.sync()
+        logging.info("Successfully synced global commands")
 
         logging.info("Bot setup complete")
 
