@@ -36,16 +36,14 @@ async def get_opening_status(
     )
     has_pick_countdown = bool(dom.xpath('//*[@id="pound-pick-countdown"]'))
 
-    script_match = re.search(r'"timeTillOpen_ms"\s*:\s*(\d+)', text)
-    remaining_ms = int(script_match.group(1)) if script_match else None
-
     if has_pick_countdown:
         remaining_count = extract_remaining_count(dom, event_type)
         return OpeningOpen(
             is_open=True, event_type=event_type, remaining_count=remaining_count
         )
 
-    if remaining_ms is not None:
+    if match := re.search(r'"timeTillOpen_ms"\s*:\s*(\d+)', text):
+        remaining_ms = int(match.group(1))
         return OpeningClosed(
             is_open=False,
             event_type=event_type,
