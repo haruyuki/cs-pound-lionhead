@@ -88,7 +88,7 @@ class IdentifyCog(commands.Cog):
             pet_id = parse_qs(link_query).get("k", [None])[0]
             async with self.bot.archive_db_pool.acquire() as conn:
                 async with conn.execute(
-                    "SELECT petEvent, petYear, petLink, petLink FROM Pets WHERE petID = ?",
+                    "SELECT petEvent, petYear, petLink FROM Pets WHERE petID = ?",
                     (pet_id,),
                 ) as cursor:
                     data = await cursor.fetchone()
@@ -112,6 +112,7 @@ class IdentifyCog(commands.Cog):
                     "An error occurred while identifying the pet. Please try a different link.",
                     ephemeral=True,
                 )
+            return
 
         logging.error("Could not identify pet or item from link: %s", link)
         await interaction.response.send_message(
