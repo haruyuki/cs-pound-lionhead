@@ -108,25 +108,25 @@ class Client:
     async def get_archive(
         self, pet_id: str, *, years: Iterable[int] | None = None
     ) -> list[Pet]:
-        """Find an image's k ID in archives. This may require many HTTP requests."""
+        """Find all archive records for an image's k ID."""
+        return [entry async for entry in self._iter_pet_matches(pet_id, years)]
+
+    async def _iter_pet_matches(self, pet_id: str, years: Iterable[int] | None):
         if not isinstance(pet_id, str) or not pet_id.strip():
             raise ValueError("pet_id must be a nonempty image k ID")
         if years is None:
             years = range(2008, datetime.now(timezone.utc).year + 1)
-        matches = []
-        for year in years:
+        for year in dict.fromkeys(years):
             for event in await self.get_archive_events(year):
                 page = await self.get_archive_event(event, "pets", year)
-                matches.extend(
-                    entry
-                    for entry in page.entries
-                    if isinstance(entry, Pet) and entry.id == pet_id
-                )
-        return matches
+                for entry in page.entries:
+                    if isinstance(entry, Pet) and entry.id == pet_id:
+                        yield entry
 
     async def get_pet(
         self, pet_id: str, *, years: Iterable[int] | None = None
     ) -> Pet | None:
         """Return the first archive record for an image k ID, or None."""
-        matches = await self.get_archive(pet_id, years=years)
-        return matches[0] if matches else None
+        async for entry in self._iter_pet_matches(pet_id, years):
+            return entry
+        return None
