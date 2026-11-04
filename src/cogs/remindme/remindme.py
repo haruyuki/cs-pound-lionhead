@@ -60,6 +60,13 @@ class RemindMeCog(commands.Cog):
         self._pending_tasks.add(task)
         task.add_done_callback(self._pending_tasks.discard)
 
+    async def cog_unload(self) -> None:
+        tasks = tuple(self._pending_tasks)
+        for task in tasks:
+            task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+        self._pending_tasks.clear()
+
     async def send_reminder(
         self, delay_seconds: int, channel_id: int, user_mention: str, amount: str
     ) -> None:
@@ -72,7 +79,10 @@ class RemindMeCog(commands.Cog):
             except (discord.Forbidden, discord.NotFound, discord.HTTPException):
                 return
 
-        await channel.send(f"{user_mention}, this is your {amount} reminder!")
+        try:
+            await channel.send(f"{user_mention}, this is your {amount} reminder!")
+        except discord.HTTPException:
+            logger.exception("Failed to send reminder to channel %s", channel_id)
 
 
 def parse_time_string(value: str) -> tuple[int, int, int] | None:
