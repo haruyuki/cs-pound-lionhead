@@ -7,6 +7,8 @@ import os
 import sys
 from typing import List
 
+from chickensmoothie import Client
+
 import aiohttp
 import asqlite
 import colorlog
@@ -18,7 +20,7 @@ from pymongo.asynchronous.collection import AsyncCollection
 
 import cogs
 from tasks import autoremind_task, initialize_reminder_times, rss_feed_task
-from utils import chickensmoothie_login, mongodb_login
+from utils import mongodb_login
 
 load_dotenv()
 
@@ -43,9 +45,12 @@ class Bot(commands.Bot):
         self.autoremind_client = autoremind_client
         self.autoremind_collection = autoremind_collection
         self.web_client = web_client
+        self.chickensmoothie = Client(web_client)
 
     async def setup_hook(self):
-        await chickensmoothie_login(self.web_client)
+        await self.chickensmoothie.login(
+            os.getenv("CS_USERNAME"), os.getenv("CS_PASSWORD")
+        )
 
         for extension in self.initial_extensions:
             logging.info("Loading extension: %s", extension)

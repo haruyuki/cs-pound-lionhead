@@ -4,20 +4,14 @@ import asyncio
 import datetime
 import logging
 import os
-from urllib.parse import unquote, urljoin
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 from typing import Literal
 
-from src.cogs.updatedb.update_archive import (
-    ArchiveEvent,
-    get_category,
-    fetch_event_links,
-    process_event,
-    get_event_title,
-)
+from chickensmoothie.archive import ArchiveEvent, get_category
+from .update_archive import process_event
 
 CATEGORY_NAMES = {
     "monthly": "Monthly Events",
@@ -58,22 +52,16 @@ class UpdateDbCog(commands.Cog):
             f"Preparing updating {table} database for year {year}..."
         )
 
-        event_links = await fetch_event_links(self.bot.web_client, year, table)
+        archive_events = await self.bot.chickensmoothie.get_archive_events(year, table)
 
         events = []
         monthly_events = []
         special_events = []
         processing_status = {}
         embed_bucket = {}
-        for event in event_links:
-            clean_link = unquote(event.split("?")[0])
-
-            event_title = get_event_title(clean_link)
-            event_link = urljoin("https://www.chickensmoothie.com", clean_link)
-            new_event = ArchiveEvent(
-                title=event_title,
-                link=event_link,
-            )
+        for new_event in archive_events:
+            event_title = new_event.title
+            event_link = new_event.link
             events.append(new_event)
 
             category = get_category(event_title)
@@ -123,7 +111,7 @@ class UpdateDbCog(commands.Cog):
                 await interaction.edit_original_response(embeds=[embed])
 
                 event_result = await process_event(
-                    self.bot.web_client,
+                    self.bot.chickensmoothie,
                     conn,
                     event,
                     table,

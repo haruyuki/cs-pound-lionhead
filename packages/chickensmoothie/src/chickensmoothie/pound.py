@@ -2,7 +2,6 @@ import re
 import math
 from dataclasses import dataclass
 
-import aiohttp
 import lxml.html
 
 
@@ -23,13 +22,8 @@ class OpeningOpen:
 OpeningStatus = OpeningClosed | OpeningOpen
 
 
-async def get_opening_status(
-    session: aiohttp.ClientSession,
-) -> OpeningStatus:
-    async with session.get("/poundandlostandfound.php") as resp:
-        resp.raise_for_status()
-        text = await resp.text()
-        dom = lxml.html.fromstring(text)
+def parse_opening_status(text: str) -> OpeningStatus:
+    dom = lxml.html.fromstring(text)
 
     event_type = get_event_type(
         normalise(get_first_text(dom, '//div[@id="csbody"]//h2[1]/text()'))

@@ -4,8 +4,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from src.utils import get_opening_status
-
 
 class TimeCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -15,8 +13,7 @@ class TimeCog(commands.Cog):
         name="time", description="Check how long before the pound/lost & found opens."
     )
     async def time(self, interaction: discord.Interaction) -> None:
-        session = self.bot.web_client
-        opening_status = await get_opening_status(session)
+        opening_status = await self.bot.chickensmoothie.get_opening_status()
 
         if opening_status.is_open:
             message = f"The {opening_status.event_type} is currently open with {opening_status.remaining_count} {'pets' if opening_status.event_type == 'Pound' else 'items'} remaining! [Go {'adopt a pet' if opening_status.event_type == 'Pound' else 'get an item'} from the {opening_status.event_type}!](https://www.chickensmoothie.com/poundandlostandfound.php)"

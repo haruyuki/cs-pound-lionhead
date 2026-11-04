@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import logging
-import re
-from typing import Tuple
 from urllib.parse import urlparse, parse_qs, quote
+
+from chickensmoothie import (
+    is_valid_chickensmoothie_link,
+    parse_item_ids as extract_item_ids,
+)
 
 import discord
 from discord import app_commands
@@ -115,25 +118,6 @@ class IdentifyCog(commands.Cog):
             "Could not identify the pet or item. Please try a different link.",
             ephemeral=True,
         )
-
-
-def is_valid_chickensmoothie_link(link: str) -> bool:
-    hostname = urlparse(link).hostname
-    return hostname in {
-        "www.chickensmoothie.com",
-        "chickencdn.com",
-        "static.chickensmoothie.com",
-    }
-
-
-def extract_item_ids(link: str) -> Tuple[int | None, int | None]:
-    path = urlparse(link).path
-    m = re.search(r"/item/(\d+)&p=(\d+)", path)
-    if not m:
-        return None, None
-    left_id = int(m.group(1))
-    right_id = int(m.group(2))
-    return left_id, right_id
 
 
 def prepare_message(

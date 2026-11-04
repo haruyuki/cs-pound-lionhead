@@ -6,8 +6,6 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Sequence
 
-from src.utils import get_opening_status
-
 logger = logging.getLogger(__name__)
 
 SUPPORTED_OPENING_TYPES = ("pound", "laf")
@@ -63,7 +61,7 @@ async def autoremind_remove_handler(collection, opening_type: str) -> None:
 
 async def run_task(bot) -> int:
     if not _STATE.in_countdown:
-        timeout_minutes = await get_sleep_minutes(bot.web_client)
+        timeout_minutes = await get_sleep_minutes(bot.chickensmoothie)
         if timeout_minutes is not None:
             return timeout_minutes
 
@@ -90,8 +88,8 @@ async def run_task(bot) -> int:
     return 1
 
 
-async def get_sleep_minutes(session) -> int | None:
-    opening_status = await get_opening_status(session)
+async def get_sleep_minutes(client) -> int | None:
+    opening_status = await client.get_opening_status()
 
     if opening_status.is_open:
         logger.info("%s has opened!", opening_status.event_type)

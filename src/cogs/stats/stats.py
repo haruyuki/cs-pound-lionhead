@@ -10,7 +10,6 @@ from discord.ext import commands
 
 from utils import (
     check_mongodb_status,
-    check_chickensmoothie_status,
 )
 
 start_time = datetime.now()
@@ -45,7 +44,7 @@ class StatsCog(commands.Cog):
         )
         chickensmoothie_login_status = (
             "Logged in"
-            if await check_chickensmoothie_status(self.bot.web_client)
+            if await self.bot.chickensmoothie.is_logged_in()
             else "Not logged in"
         )
 
