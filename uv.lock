@@ -283,18 +283,15 @@ wheels = [
 [[package]]
 name = "chickensmoothie"
 version = "0.1.0"
-source = { editable = "packages/chickensmoothie" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
     { name = "cssselect" },
     { name = "lxml" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "aiohttp", specifier = ">=3.13.5" },
-    { name = "cssselect", specifier = ">=1.4.0" },
-    { name = "lxml", specifier = ">=6.0.4" },
+sdist = { url = "https://files.pythonhosted.org/packages/32/1d/12fdc25326b6db8bb0e9a83329d2946aa7574211383743bc2accd2ae0939/chickensmoothie-0.1.0.tar.gz", hash = "sha256:b54df54cf514d0e154f862ef67c589e30930f63b25cc19762c21f76bfa2cfcbf", size = 11776, upload-time = "2026-11-05T03:16:16.844Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d3/a9/0463910c096b7a4e46fa67540fb5d6fc4c73bbbcbea552d83b7d832789ae/chickensmoothie-0.1.0-py3-none-any.whl", hash = "sha256:9f21329cffdf8a44429bbcb6334e4ee9726ea6db043d9926941f770b1acb99f3", size = 9025, upload-time = "2026-11-05T03:16:15.531Z" },
 ]
 
 [[package]]
@@ -359,7 +356,7 @@ dev = [
 requires-dist = [
     { name = "aiohttp", specifier = ">=3.13.5" },
     { name = "asqlite", specifier = "==2.0.0" },
-    { name = "chickensmoothie", editable = "packages/chickensmoothie" },
+    { name = "chickensmoothie", specifier = ">=0.1.0" },
     { name = "colorlog", specifier = ">=6.10.1" },
     { name = "cssselect", specifier = ">=1.4.0" },
     { name = "discord-py", specifier = ">=2.7.1" },

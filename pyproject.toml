@@ -4,7 +4,7 @@ version = "4.0.0"
 description = "A Discord bot for the virtual pet adoption site Chicken Smoothie."
 requires-python = ">=3.13"
 dependencies = [
-    "chickensmoothie",
+    "chickensmoothie>=0.1.0",
     "aiohttp>=3.13.5",
     "asqlite==2.0.0",
     "colorlog>=6.10.1",
@@ -23,7 +23,3 @@ dev = [
     "black==26.3.1",
     "jishaku==2.6.3",
 ]
-
-
-[tool.uv.sources]
-chickensmoothie = { path = "packages/chickensmoothie", editable = true }
